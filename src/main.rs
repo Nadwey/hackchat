@@ -22,6 +22,7 @@ async fn post_message(username: String, msg: Form<PostMsg>) -> RawHtml<String> {
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
+        .create(true)
         .open("chat.txt")
         .unwrap();
     let _stamp = chrono::offset::Utc::now().to_string();
