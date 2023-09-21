@@ -116,6 +116,11 @@
 	}
 </style>
 <script defer>
+	/**
+	 * true if user scrolls to the bottom of the page
+	 */
+	let shouldScroll = true;
+
 	async function post() {
 		// const locationSplitted = window.location.href.split("/");
 		// const username = locationSplitted[locationSplitted.length - 2];
@@ -135,25 +140,34 @@
 
 		document.getElementById("content").value = "";
 
-
 		await refresh();
-		setTimeout(() => msgbox.scrollIntoView(true), 0);
 	}
 
 	async function refresh() {
 		const res = await fetch(window.location.origin + "/get_chat");
 
 		document.getElementById("chat").innerHTML = await res.text();
+
+		if (shouldScroll)
+			setTimeout(() => document.getElementById("msg").scrollIntoView(true), 0);
+	}
+
+	document.body.onscroll = (e) => {
+		if (window.scrollY + window.innerHeight > document.documentElement.clientHeight - 150) {
+			shouldScroll = true;
+		}
+		else {
+			shouldScroll = false;
+		}
+
+		console.log(shouldScroll);
 	}
 
 	setInterval(() => {
 		refresh();
 	}, 2000);
 
-	const msgbox = document.getElementById("msg");
-
 	document.getElementById("content").addEventListener("keypress", (e) => {
-		console.log(e);
 		if (e.key === "Enter") post();
 	});
 
