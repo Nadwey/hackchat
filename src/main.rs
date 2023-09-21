@@ -2,6 +2,7 @@
 extern crate rocket;
 
 use rocket::response::content::RawHtml;
+use rocket::response::Redirect;
 use rocket::{form::Form, tokio::fs::read_to_string};
 
 use std::{fs::OpenOptions, io::Write};
@@ -9,6 +10,11 @@ use std::{fs::OpenOptions, io::Write};
 #[derive(FromForm)]
 struct PostMsg {
     content: String,
+}
+
+#[get("/")]
+async fn index() -> Redirect {
+    Redirect::to("/login")
 }
 
 #[post("/chat/<username>", data = "<msg>")]
@@ -65,6 +71,7 @@ async fn chat() -> RawHtml<String> {
 #[launch]
 fn rocket() -> _ {
     rocket::build()
+        .mount("/", routes![index])
         .mount("/", routes![login])
         .mount("/", routes![post_message])
         .mount("/", routes![chdata])
