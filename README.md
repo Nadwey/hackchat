@@ -1,1 +1,16 @@
-https://trublesomeban-glowing-carnival-7w45v4v44rr3r576-8000.preview.app.github.dev/login
+# Hack Chat
+
+The worst chat app you'll ever use.
+
+## Features
+
+- [x] Chat
+- [x] You can rickroll people
+
+## Usage
+
+```bash
+git clone https://github.com/trublesomeban/hackchat.git
+cd hackchat
+cargo run
+```
