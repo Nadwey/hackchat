@@ -1,8 +1,12 @@
-<form action="/chat/" method="post" id="msg">
-	> <input type="text" name="content" id="content" autofocus>
-	<button onclick="this.submit()" method="get">Send [Enter]</button>
-	<button action="/" method="get">Refresh [F5]</button>
-</form>
+<div class="chatbox">
+	<div class="title">3.14Chan</div><br>
+	<div id="chat"></div>
+	<div id="msg">
+		<input type="text" id="content" autofocus>
+		<button onclick="post()">Send [Enter]</button>
+		<button onclick="refresh()">Refresh [F5]</button>
+	</div>
+</div>
 <style>
 	img {
 		max-width: 40%;
@@ -112,19 +116,46 @@
 	}
 </style>
 <script defer>
-	// for (item of document.getElementsByClassName("tester-username")) {
-	// 	item.textContent = "[DELETED USER]"
-	// }
-	// for (item of document.getElementsByClassName("tester-msg")) {
-	// 	item.textContent = "[REMOVED BY MODERATOR]"
-	// }
-	const template = (username) => `/chat/${username}/`;
-	document.getElementById('msg').addEventListener('submit', function (s) {
-		s.preventDefault();
-		let tmp = window.location.href.split("/")
-		this.action = template(tmp[tmp.length - 2]);
-		this.submit();
-	});
+	async function post() {
+		// const locationSplitted = window.location.href.split("/");
+		// const username = locationSplitted[locationSplitted.length - 2];
+
+		const formData = new FormData();
+		formData.append("content", document.getElementById("content").value);
+
+		const res = await fetch(window.location.origin + `/chat/${sessionStorage.getItem("username")}`, {
+			method: "POST",
+			body: formData,
+		});
+
+		if (res.status !== 200) {
+			alert("Something went wrong");
+			return;
+		}
+
+		document.getElementById("content").value = "";
+
+
+		await refresh();
+		setTimeout(() => msgbox.scrollIntoView(true), 0);
+	}
+
+	async function refresh() {
+		const res = await fetch(window.location.origin + "/get_chat");
+
+		document.getElementById("chat").innerHTML = await res.text();
+	}
+
+	setInterval(() => {
+		refresh();
+	}, 2000);
+
 	const msgbox = document.getElementById("msg");
-	setTimeout(() => msgbox.scrollIntoView(true), 0)
+
+	document.getElementById("content").addEventListener("keypress", (e) => {
+		console.log(e);
+		if (e.key === "Enter") post();
+	});
+
+	refresh();
 </script>

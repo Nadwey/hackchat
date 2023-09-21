@@ -1,10 +1,10 @@
 <div class="center">
 	<div class="title">3.14Chan</div>
-	<form method="post" id="login" onsubmit="return submit()" action="/chat">
-		Nazwa użytkownika<br>><input type="text" name="username" id="username" autofocus><br>
-		Wiadomość powitalna<br>><input type="text" name="content" id="content"><br>
-		<button onclick="this.submit();">Zaloguj</button>
-	</form>
+	<div id="login">
+		Nazwa użytkownika<br /><input type="text" id="username" autofocus><br />
+		Wiadomość powitalna<br /><input type="text" id="welcomeMessage"><br />
+		<button onclick="login();">Zaloguj</button>
+	</div>
 </div>
 
 <style>
@@ -95,10 +95,28 @@
 </style>
 
 <script>
-	const template = (username) => username != "" ? `/chat/${username}/` : "/chat/anonymous/";
-	document.getElementById('login').addEventListener('submit', function (s) {
-		s.preventDefault();
-		this.action = template(this.elements["username"].value);
-		this.submit();
-	});
+	async function login() {
+		const username = document.getElementById("username").value;
+		const welcomeMessage = document.getElementById("welcomeMessage").value;
+
+		const formData = new FormData();
+		formData.append("content", welcomeMessage);
+
+		sessionStorage.setItem("username", username);
+
+		const res = await fetch(window.location.origin + `/chat/${sessionStorage.getItem("username")}`, {
+			method: "POST",
+			body: formData,
+		});
+
+		if (res.status === 200)
+			location.href = location.origin + "/chat";
+		else alert("Something went wrong")
+	}
+
+	document.onkeypress = (e) => {
+		if (e.key === "Enter")  {
+			login();
+		}
+	}
 </script>

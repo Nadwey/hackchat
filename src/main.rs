@@ -12,7 +12,7 @@ struct PostMsg {
 }
 
 #[post("/chat/<username>", data = "<msg>")]
-async fn chat(username: String, msg: Form<PostMsg>) -> RawHtml<String> {
+async fn post_message(username: String, msg: Form<PostMsg>) -> RawHtml<String> {
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
@@ -29,10 +29,7 @@ async fn chat(username: String, msg: Form<PostMsg>) -> RawHtml<String> {
         .unwrap();
     }
     return RawHtml(format!(
-        "<div class=\"chatbox\"><div class=\"title\">Hackchat.exe</div><br>{}{}</div>",
-        // msg.content,
-        read_to_string("chat.txt").await.unwrap(),
-        read_to_string("html/chat.html").await.unwrap()
+        "ok"
     ));
 }
 
@@ -49,10 +46,28 @@ async fn login() -> RawHtml<String> {
     ));
 }
 
+#[get("/get_chat")]
+async fn get_chat() -> RawHtml<String> {
+    return RawHtml(format!(
+        "{}",
+        read_to_string("chat.txt").await.unwrap()
+    ));
+}
+
+#[get("/chat")]
+async fn chat() -> RawHtml<String> {
+    return RawHtml(format!(
+        "{}",
+        read_to_string("html/chat.html").await.unwrap()
+    ));
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![login])
-        .mount("/", routes![chat])
+        .mount("/", routes![post_message])
         .mount("/", routes![chdata])
+        .mount("/", routes![get_chat])
+        .mount("/", routes![chat])
 }
