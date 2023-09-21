@@ -99,12 +99,13 @@
 		const username = document.getElementById("username").value;
 		const welcomeMessage = document.getElementById("welcomeMessage").value;
 
-		const formData = new FormData();
-		formData.append("content", welcomeMessage);
-
 		sessionStorage.setItem("username", username);
 
-		const res = await fetch(window.location.origin + `/chat/${sessionStorage.getItem("username")}`, {
+		const formData = new FormData();
+		formData.append("content", welcomeMessage);
+		formData.append("username", username);
+
+		const res = await fetch(window.location.origin + `/post_message`, {
 			method: "POST",
 			body: formData,
 		});
