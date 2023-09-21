@@ -122,8 +122,12 @@
 	let shouldScroll = true;
 
 	async function post() {
+		const message = document.getElementById("content").value;
+
+		if (message === "") return;
+
 		const formData = new FormData();
-		formData.append("content", document.getElementById("content").value);
+		formData.append("content", message);
 		formData.append("username", sessionStorage.getItem("username"));
 
 		const res = await fetch(window.location.origin + `/post_message`, {
