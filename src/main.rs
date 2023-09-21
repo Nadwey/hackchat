@@ -10,6 +10,7 @@ use std::{fs::OpenOptions, io::Write};
 #[derive(FromForm)]
 struct PostMsg {
     content: String,
+    username: String,
 }
 
 #[get("/")]
@@ -17,27 +18,31 @@ async fn index() -> Redirect {
     Redirect::to("/login")
 }
 
-#[post("/chat/<username>", data = "<msg>")]
-async fn post_message(username: String, msg: Form<PostMsg>) -> RawHtml<String> {
+#[post("/post_message", data = "<msg>")]
+fn post_message(msg: Form<PostMsg>) -> String {
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
         .open("chat.txt")
         .unwrap();
+    
     let _stamp = chrono::offset::Utc::now().to_string();
     let timestamp = _stamp.split(".").next().unwrap();
+
+    let username = &msg.username;
+    let message = &msg.content;
+
     if !msg.content.is_empty() {
         writeln!(
             file,
             "<span class=\"timestamp\">{timestamp}</span> <span class=\"{username}-username username\">[{username}]</span> <a class=\"{username}-msg msgbox\">{}</a><br>",
-            msg.content
+            message
         )
         .unwrap();
     }
-    return RawHtml(format!(
-        "ok"
-    ));
+    
+    return String::from("Hello, world!");
 }
 
 #[get("/chdata")]
