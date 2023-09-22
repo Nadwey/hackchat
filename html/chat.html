@@ -49,6 +49,12 @@
 			}
 		
 			async function refresh() {
+				if (sessionStorage.getItem("username") === null) {
+					alert("Please log in first");
+					location.href = location.origin;
+					return;
+				}
+
 				const res = await fetch(window.location.origin + "/get_chat");
 		
 				document.getElementById("chat").innerHTML = await res.text();
@@ -65,9 +71,7 @@
 			};
 		
 			// TODO: replace with websockets
-			setInterval(() => {
-				refresh();
-			}, 2000);
+			setInterval(refresh, 2000);
 		
 			document.getElementById("content").addEventListener("keypress", (e) => {
 				if (e.key === "Enter") post();
