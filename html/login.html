@@ -1,123 +1,45 @@
-<div class="center">
-	<div class="title">3.14Chan</div>
-	<div id="login">
-		Nazwa użytkownika<br /><input type="text" id="username" autofocus><br />
-		Wiadomość powitalna<br /><input type="text" id="welcomeMessage"><br />
-		<button onclick="login();">Zaloguj</button>
-	</div>
-</div>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="css/all.css" />
+        <link rel="stylesheet" href="css/login.css" />
+        <title>Hack Chat</title>
+    </head>
+    <body>
+        <div class="center">
+            <div class="title">3.14Chan</div>
+            <div id="login">
+                Nazwa użytkownika<br /><input type="text" id="username" autofocus /><br />
+                Wiadomość powitalna<br /><input type="text" id="welcomeMessage" /><br />
+                <button onclick="login();">Zaloguj</button>
+            </div>
+        </div>
+        <script>
+            async function login() {
+                const username = document.getElementById("username").value;
+                const welcomeMessage = document.getElementById("welcomeMessage").value;
 
-<style>
-	input {
-		font-family: monospace;
-		color: lightgreen;
-		font-weight: bold;
-		position: relative;
-		display: inline-block;
-		outline: none;
-		margin: 6px;
-		border: none 2px;
-		background-color: black;
-		color: white;
-	}
+                sessionStorage.setItem("username", username);
 
-	input::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: -15px;
-		display: inline-block;
-		background-color: #606060;
-		vertical-align: top;
-		width: 20px;
-		height: 24px;
-		-webkit-animation: blink 1s step-end infinite;
-		animation: blink 1s step-end infinite;
-		min-width: 360px;
-	}
+                const formData = new FormData();
+                formData.append("content", welcomeMessage);
+                formData.append("username", username);
 
-	@-webkit-keyframes blink {
-		0% {
-			opacity: 1.0;
-		}
+                const res = await fetch(window.location.origin + `/post_message`, {
+                    method: "POST",
+                    body: formData,
+                });
 
-		50% {
-			opacity: 0.0;
-		}
+                if (res.status === 200) location.href = location.origin + "/chat";
+                else alert("Something went wrong");
+            }
 
-		100% {
-			opacity: 1.0;
-		}
-	}
-
-	@keyframes blink {
-		0% {
-			opacity: 1.0;
-		}
-
-		50% {
-			opacity: 0.0;
-		}
-
-		100% {
-			opacity: 1.0;
-		}
-	}
-
-	button {
-		outline: none;
-		border: none 2px;
-		background-color: lightgreen;
-		color: black;
-		font-family: monospace;
-		font-weight: bolder;
-	}
-
-	body {
-		font-family: monospace;
-		color: lightgreen;
-		background-color: black;
-	}
-
-	.title {
-		font-size: 32;
-	}
-
-	.center {
-		border: solid;
-		border-color: lightgreen;
-		border-width: 2px;
-		margin: auto;
-		width: 20%;
-		padding: 10px;
-		font-weight: bold;
-	}
-</style>
-
-<script>
-	async function login() {
-		const username = document.getElementById("username").value;
-		const welcomeMessage = document.getElementById("welcomeMessage").value;
-
-		sessionStorage.setItem("username", username);
-
-		const formData = new FormData();
-		formData.append("content", welcomeMessage);
-		formData.append("username", username);
-
-		const res = await fetch(window.location.origin + `/post_message`, {
-			method: "POST",
-			body: formData,
-		});
-
-		if (res.status === 200)
-			location.href = location.origin + "/chat";
-		else alert("Something went wrong")
-	}
-
-	document.onkeypress = (e) => {
-		if (e.key === "Enter")  {
-			login();
-		}
-	}
-</script>
+            document.onkeypress = (e) => {
+                if (e.key === "Enter") {
+                    login();
+                }
+            };
+        </script>
+    </body>
+</html>

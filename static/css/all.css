@@ -1,0 +1,87 @@
+img {
+    max-width: 40%;
+    max-height: 25%;
+}
+
+body {
+    font-family: monospace;
+    color: lightgreen;
+    background-color: black;
+}
+
+input {
+    font-family: monospace;
+    color: lightgreen;
+    font-weight: bold;
+    position: relative;
+    display: inline-block;
+    outline: none;
+    margin: 6px;
+    border: none 2px;
+    background-color: black;
+    color: white;
+}
+
+input::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -15px;
+    display: inline-block;
+    background-color: #606060;
+    vertical-align: top;
+    width: 20px;
+    height: 24px;
+    -webkit-animation: blink 1s step-end infinite;
+    animation: blink 1s step-end infinite;
+    min-width: 360px;
+}
+
+@-webkit-keyframes blink {
+    0% {
+        opacity: 1.0;
+    }
+
+    50% {
+        opacity: 0.0;
+    }
+
+    100% {
+        opacity: 1.0;
+    }
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1.0;
+    }
+
+    50% {
+        opacity: 0.0;
+    }
+
+    100% {
+        opacity: 1.0;
+    }
+}
+
+button {
+    outline: none;
+    border: none 2px;
+    background-color: lightgreen;
+    color: black;
+    font-family: monospace;
+    font-weight: bolder;
+}
+
+br {
+    margin: 8px;
+}
+
+.timestamp {
+    font-weight: lighter;
+}
+
+.title {
+    font-size: 2rem;
+}

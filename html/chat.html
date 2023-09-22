@@ -1,176 +1,79 @@
-<div class="chatbox">
-	<div class="title">3.14Chan</div><br>
-	<div id="chat"></div>
-	<div id="msg">
-		<input type="text" id="content" autofocus>
-		<button onclick="post()">Send [Enter]</button>
-		<button onclick="refresh()">Refresh</button>
-	</div>
-</div>
-<style>
-	img {
-		max-width: 40%;
-		max-height: 25%;
-	}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+		<link rel="stylesheet" href="css/all.css" />
+		<link rel="stylesheet" href="css/chat.css" />
+        <title>Hack Chat</title>
+    </head>
+	<body>
+		<div class="chatbox">
+			<div class="title">3.14Chan</div>
+			<br />
+			<div id="chat"></div>
+			<div id="msg">
+				<input type="text" id="content" autofocus />
+				<button onclick="post()">Send [Enter]</button>
+				<button onclick="refresh()">Refresh</button>
+			</div>
+		</div>
 
-	body {
-		font-family: monospace;
-		color: lightgreen;
-		background-color: black;
-	}
-
-	input {
-		font-family: monospace;
-		color: lightgreen;
-		font-weight: bold;
-		position: relative;
-		display: inline-block;
-		outline: none;
-		margin: 6px;
-		border: none 2px;
-		background-color: black;
-		color: white;
-	}
-
-	input::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: -15px;
-		display: inline-block;
-		background-color: #606060;
-		vertical-align: top;
-		width: 20px;
-		height: 24px;
-		-webkit-animation: blink 1s step-end infinite;
-		animation: blink 1s step-end infinite;
-		min-width: 360px;
-	}
-
-	@-webkit-keyframes blink {
-		0% {
-			opacity: 1.0;
-		}
-
-		50% {
-			opacity: 0.0;
-		}
-
-		100% {
-			opacity: 1.0;
-		}
-	}
-
-	@keyframes blink {
-		0% {
-			opacity: 1.0;
-		}
-
-		50% {
-			opacity: 0.0;
-		}
-
-		100% {
-			opacity: 1.0;
-		}
-	}
-
-	button {
-		outline: none;
-		border: none 2px;
-		background-color: lightgreen;
-		color: black;
-		font-family: monospace;
-		font-weight: bolder;
-	}
-
-	br {
-		margin: 8px;
-	}
-
-	.content {
-		border: none;
-		border-radius: 4;
-	}
-
-	.username {
-		font-weight: bolder;
-	}
-
-	.chatbox {
-		border: solid;
-		border-color: lightgreen;
-		border-width: 2px;
-		margin: auto;
-		width: 50%;
-		padding: 10px;
-		font-weight: bold;
-	}
-
-	.timestamp {
-		font-weight: lighter;
-	}
-
-	.title {
-		font-size: 32;
-	}
-</style>
-<script defer>
-	/**
-	 * true if user scrolls to the bottom of the page
-	 */
-	let shouldScroll = true;
-
-	async function post() {
-		const message = document.getElementById("content").value;
-
-		if (message === "") return;
-
-		const formData = new FormData();
-		formData.append("content", message);
-		formData.append("username", sessionStorage.getItem("username"));
-
-		const res = await fetch(window.location.origin + `/post_message`, {
-			method: "POST",
-			body: formData,
-		});
-
-		if (res.status !== 200) {
-			alert("Something went wrong");
-			return;
-		}
-
-		document.getElementById("content").value = "";
-
-		await refresh();
-	}
-
-	async function refresh() {
-		const res = await fetch(window.location.origin + "/get_chat");
-
-		document.getElementById("chat").innerHTML = await res.text();
-
-		if (shouldScroll)
-			setTimeout(() => document.getElementById("msg").scrollIntoView(true), 0);
-	}
-
-	document.body.onscroll = (e) => {
-		if (window.scrollY + window.innerHeight > document.documentElement.clientHeight - 150) {
-			shouldScroll = true;
-		}
-		else {
-			shouldScroll = false;
-		}
-	}
-
-	// TODO: replace with websockets
-	setInterval(() => {
-		refresh();
-	}, 2000);
-
-	document.getElementById("content").addEventListener("keypress", (e) => {
-		if (e.key === "Enter") post();
-	});
-
-	refresh();
-</script>
+		<script>
+			/**
+			 * true if user scrolls to the bottom of the page
+			 */
+			let shouldScroll = true;
+		
+			async function post() {
+				const message = document.getElementById("content").value;
+		
+				if (message === "") return;
+		
+				const formData = new FormData();
+				formData.append("content", message);
+				formData.append("username", sessionStorage.getItem("username"));
+		
+				const res = await fetch(window.location.origin + `/post_message`, {
+					method: "POST",
+					body: formData,
+				});
+		
+				if (res.status !== 200) {
+					alert("Something went wrong");
+					return;
+				}
+		
+				document.getElementById("content").value = "";
+		
+				await refresh();
+			}
+		
+			async function refresh() {
+				const res = await fetch(window.location.origin + "/get_chat");
+		
+				document.getElementById("chat").innerHTML = await res.text();
+		
+				if (shouldScroll) setTimeout(() => document.getElementById("msg").scrollIntoView(true), 0);
+			}
+		
+			document.body.onscroll = (e) => {
+				if (window.scrollY + window.innerHeight > document.documentElement.clientHeight - 150) {
+					shouldScroll = true;
+				} else {
+					shouldScroll = false;
+				}
+			};
+		
+			// TODO: replace with websockets
+			setInterval(() => {
+				refresh();
+			}, 2000);
+		
+			document.getElementById("content").addEventListener("keypress", (e) => {
+				if (e.key === "Enter") post();
+			});
+		
+			refresh();
+		</script>
+	</body>
+</html>

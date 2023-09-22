@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::response::Redirect;
-use rocket::form::Form;
+use rocket::{form::Form, fs::FileServer};
 use rocket::fs::NamedFile;
+use rocket::response::Redirect;
 
 use std::{fs::OpenOptions, io::Write};
 
@@ -62,8 +62,7 @@ async fn chat() -> Option<NamedFile> {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount(
-        "/",
-        routes![index, login, post_message, get_chat, chat],
-    )
+    rocket::build()
+        .mount("/", routes![index, login, post_message, get_chat, chat])
+        .mount("/", FileServer::from("static"))
 }

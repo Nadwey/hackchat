@@ -1,0 +1,9 @@
+.center {
+    border: solid;
+    border-color: lightgreen;
+    border-width: 2px;
+    margin: auto;
+    width: 20%;
+    padding: 10px;
+    font-weight: bold;
+}
