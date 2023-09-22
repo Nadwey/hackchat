@@ -63,7 +63,7 @@
 			}
 		
 			document.body.onscroll = (e) => {
-				if (window.scrollY + window.innerHeight > document.documentElement.clientHeight - 150) {
+				if (window.scrollY + window.innerHeight > document.body.clientHeight - 150) {
 					shouldScroll = true;
 				} else {
 					shouldScroll = false;
