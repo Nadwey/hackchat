@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::response::content::RawHtml;
 use rocket::response::Redirect;
-use rocket::{form::Form, tokio::fs::read_to_string};
+use rocket::form::Form;
+use rocket::fs::NamedFile;
 
 use std::{fs::OpenOptions, io::Write};
 
@@ -26,7 +26,7 @@ fn post_message(msg: Form<PostMsg>) -> String {
         .create(true)
         .open("chat.txt")
         .unwrap();
-    
+
     let _stamp = chrono::offset::Utc::now().to_string();
     let timestamp = _stamp.split(".").next().unwrap();
 
@@ -41,46 +41,29 @@ fn post_message(msg: Form<PostMsg>) -> String {
         )
         .unwrap();
     }
-    
+
     return String::from("Hello, world!");
 }
 
-#[get("/chdata")]
-async fn chdata() -> String {
-    read_to_string("chat.txt").await.unwrap()
-}
-
 #[get("/login")]
-async fn login() -> RawHtml<String> {
-    return RawHtml(format!(
-        "{}",
-        read_to_string("html/login.html").await.unwrap()
-    ));
+async fn login() -> Option<NamedFile> {
+    NamedFile::open("html/login.html").await.ok()
 }
 
 #[get("/get_chat")]
-async fn get_chat() -> RawHtml<String> {
-    return RawHtml(format!(
-        "{}",
-        read_to_string("chat.txt").await.unwrap()
-    ));
+async fn get_chat() -> Option<NamedFile> {
+    NamedFile::open("chat.txt").await.ok()
 }
 
 #[get("/chat")]
-async fn chat() -> RawHtml<String> {
-    return RawHtml(format!(
-        "{}",
-        read_to_string("html/chat.html").await.unwrap()
-    ));
+async fn chat() -> Option<NamedFile> {
+    NamedFile::open("html/chat.html").await.ok()
 }
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build()
-        .mount("/", routes![index])
-        .mount("/", routes![login])
-        .mount("/", routes![post_message])
-        .mount("/", routes![chdata])
-        .mount("/", routes![get_chat])
-        .mount("/", routes![chat])
+    rocket::build().mount(
+        "/",
+        routes![index, login, post_message, get_chat, chat],
+    )
 }
