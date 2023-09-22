@@ -1,25 +1,25 @@
-#[macro_use]
-extern crate rocket;
+use axum::{
+    response::{Html, IntoResponse, Redirect},
+    routing::{get, post},
+    Router,
+};
+use axum_typed_multipart::{TryFromMultipart, TypedMultipart};
+use std::{fs::OpenOptions, io::Write, net::SocketAddr};
+use tokio::fs;
 
-use rocket::{form::Form, fs::FileServer};
-use rocket::fs::NamedFile;
-use rocket::response::Redirect;
-
-use std::{fs::OpenOptions, io::Write};
-
-#[derive(FromForm)]
+#[derive(TryFromMultipart)]
 struct PostMsg {
-    content: String,
     username: String,
+    content: String,
 }
 
-#[get("/")]
 async fn index() -> Redirect {
     Redirect::to("/login")
 }
 
-#[post("/post_message", data = "<msg>")]
-fn post_message(msg: Form<PostMsg>) -> String {
+async fn post_message(
+    TypedMultipart(PostMsg { username, content }): TypedMultipart<PostMsg>,
+) -> impl IntoResponse {
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
@@ -27,42 +27,45 @@ fn post_message(msg: Form<PostMsg>) -> String {
         .open("chat.txt")
         .unwrap();
 
-    let _stamp = chrono::offset::Utc::now().to_string();
-    let timestamp = _stamp.split(".").next().unwrap();
+    let stamp = chrono::offset::Utc::now().to_string();
+    let timestamp = stamp.split(".").next().unwrap();
 
-    let username = &msg.username;
-    let message = &msg.content;
-
-    if !msg.content.is_empty() {
+    if !content.is_empty() {
         writeln!(
             file,
             "<span class=\"timestamp\">{timestamp}</span> <span class=\"{username}-username username\">[{username}]</span> <a class=\"{username}-msg msgbox\">{}</a><br>",
-            message
-        )
-        .unwrap();
+            content
+        ).unwrap();
     }
 
-    return String::from("Hello, world!");
+    return "ok";
 }
 
-#[get("/login")]
-async fn login() -> Option<NamedFile> {
-    NamedFile::open("html/login.html").await.ok()
+async fn login() -> impl IntoResponse {
+    return Html(fs::read_to_string("html/login.html").await.unwrap());
 }
 
-#[get("/get_chat")]
-async fn get_chat() -> Option<NamedFile> {
-    NamedFile::open("chat.txt").await.ok()
+async fn get_chat() -> impl IntoResponse {
+    return fs::read_to_string("chat.txt").await.unwrap();
 }
 
-#[get("/chat")]
-async fn chat() -> Option<NamedFile> {
-    NamedFile::open("html/chat.html").await.ok()
+async fn chat() -> impl IntoResponse {
+    return Html(fs::read_to_string("html/chat.html").await.unwrap());
 }
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
-        .mount("/", routes![index, login, post_message, get_chat, chat])
-        .mount("/", FileServer::from("static"))
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/", get(index))
+        .route("/post_message", post(post_message))
+        .route("/login", get(login))
+        .route("/get_chat", get(get_chat))
+        .route("/chat", get(chat))
+        .nest("/static", axum_static::static_router("static"));
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
