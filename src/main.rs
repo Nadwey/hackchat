@@ -1,4 +1,4 @@
-pub mod handlers;
+mod handlers;
 
 use handlers::post_message::post_message;
 
